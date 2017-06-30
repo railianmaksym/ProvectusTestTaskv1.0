@@ -47,4 +47,9 @@ public class DatabaseHelper {
 
         return items;
     }
+
+    public UsersItem selectByID(int id){
+
+        return new Select().from(UsersItem.class).where(UsersItem_Table.id.is(id+1)).querySingle();
+    }
 }

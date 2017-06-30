@@ -1,5 +1,6 @@
 package com.railian.maksym.provectustesttask;
 
+import android.database.Observable;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
     private RecyclerView usersRecyclerView;
     private List<UsersItem> mitems=new ArrayList<>();
     private SwipeRefreshLayout mSwipeRefreshLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +70,7 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
     }
 
 
-    private class UsersHolder extends RecyclerView.ViewHolder {
+    private class UsersHolder extends RecyclerView.ViewHolder  {
         private ImageView userImageView;
         private TextView userTextView;
 
@@ -77,6 +79,8 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
             userImageView=itemView.findViewById(R.id.user_item_image);
             userTextView=itemView.findViewById(R.id.user_item_fio);
         }
+
+
     }
 
     private class UsersAdapter extends RecyclerView.Adapter<UsersHolder>{
@@ -91,13 +95,16 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
         @Override
         public UsersHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater=LayoutInflater.from(UsersActivity.this);
-            View v =inflater.inflate(R.layout.users_item,parent,false);
+            View v =inflater.from(parent.getContext()).inflate(R.layout.users_item,parent,false);
+            v.setOnClickListener(new MyOnClickListener());
+
             return new UsersHolder(v);
         }
 
         @Override
         public void onBindViewHolder(UsersHolder holder, int position) {
             UsersItem usersItem=mUsersItems.get(position);
+
             Picasso.with(UsersActivity.this).load(usersItem.getUrl()).into(holder.userImageView);
 
             holder.userTextView.setText(usersItem.getName());
@@ -105,11 +112,14 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
 
         }
 
+
         @Override
         public int getItemCount() {
 
             return mUsersItems.size();
         }
+
+
     }
 
     private  class RandomUsersItemTask extends AsyncTask<Void,Void,List<UsersItem>>{
@@ -130,6 +140,17 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
 
             mitems=databaseHelper.select();
             setAdapter();
+        }
+    }
+
+    public class MyOnClickListener implements View.OnClickListener {
+        DatabaseHelper databaseHelper=new DatabaseHelper();
+        @Override
+        public void onClick(View v) {
+            int itemPosition = usersRecyclerView.indexOfChild(v);
+            UsersItem userClicked =databaseHelper.selectByID(itemPosition);
+            Log.e("Clicked on ",userClicked.getName());
+            Log.e("Clicked on ",String.valueOf(itemPosition));
         }
     }
 }
