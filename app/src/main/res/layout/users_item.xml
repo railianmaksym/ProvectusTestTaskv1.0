@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_item"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_gravity="center"
+    android:orientation="horizontal"
+    android:weightSum="1"
+    android:layout_marginBottom="5dp"
+    >
+
+    <ImageView
+        android:id="@+id/user_item_image"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="center"
+        android:layout_marginStart="5dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/user_item_fio"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/user_item_image"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="false"
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toEndOf="@+id/user_item_image"
+        android:layout_toStartOf="@+id/user_item_goforward"
+        android:gravity="center_vertical"
+        android:text="11111111111111aaaa"
+        android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+    <ImageView
+        android:id="@+id/user_item_goforward"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_action_forward" />
+
+
+
+</RelativeLayout>
