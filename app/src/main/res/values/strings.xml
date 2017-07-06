@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ProvectusTestTask</string>
+    <string name="app_name">RandomUser.me</string>
+    <string name="search_hint">Please enter a number of users</string>
+    <string name="test">test</string>
 </resources>

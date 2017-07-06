@@ -1,5 +1,7 @@
 package com.railian.maksym.provectustesttask;
 
+import android.content.Intent;
+import android.content.res.TypedArray;
 import android.database.Observable;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,87 +17,144 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.skyfishjy.library.RippleBackground;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
-public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
-    private static final String TAG="UsersActivity";
+public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+
+    // Debug tag
+    private static final String TAG = "UsersActivity";
 
     private RecyclerView usersRecyclerView;
-    private List<UsersItem> mitems=new ArrayList<>();
+    private List<Result> mitems = new ArrayList<>();
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private JsonMapper jsonMapper;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorScheme(R.color.blue,  R.color.yellow);
-        DatabaseHelper databaseHelper=new DatabaseHelper();
-
-        usersRecyclerView = (RecyclerView)findViewById(R.id.users_recycler_view);
+        mSwipeRefreshLayout.setColorScheme(R.color.blue, R.color.yellow);
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+        jsonMapper = new JsonMapper();
+        usersRecyclerView = (RecyclerView) findViewById(R.id.users_recycler_view);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+       // usersRecyclerView.setClipToOutline(true);
 
-        mitems=databaseHelper.select();
+        // If database is empty - we are load data from server
+        mitems = jsonMapper.convertToNetworkModel(databaseHelper.select());
 
-        if(mitems.isEmpty()) {
-            new RandomUsersItemTask().execute();
+        if (mitems.isEmpty()) {
+
+            loadData();
         }
 
         setAdapter();
 
     }
-    private void setAdapter(){
+
+    private void setAdapter() {
         usersRecyclerView.setAdapter(new UsersAdapter(mitems));
     }
 
     @Override
     public void onRefresh() {
+
+        // Clear database before data updating
+        final DatabaseHelper databaseHelper = new DatabaseHelper();
+        databaseHelper.deleteAll();
+
         mSwipeRefreshLayout.setRefreshing(true);
 
+        // Load data from server
         mSwipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                new RandomUsersItemTask().execute();
+                loadData();
                 mSwipeRefreshLayout.setRefreshing(false);
                 setAdapter();
             }
         }, 2000);
     }
 
+    public void loadData() {
 
-    private class UsersHolder extends RecyclerView.ViewHolder  {
+        // Retrofit request execute in async mode
+        MyApplication.getApi().getData(20, "au,br,ca,ch,de,dk,es,fi,fr,gb,ie,nz,tr,us").enqueue(new Callback<UserItem>() {
+            @Override
+            public void onResponse(Call<UserItem> call, Response<UserItem> response) {
+                DatabaseHelper databaseHelper = new DatabaseHelper();
+                if (response.isSuccessful()) {
+
+                    // Insert loaded data in database and add to current list for insert in recyclerview
+                    try {
+
+                        databaseHelper.insert(jsonMapper.convertFromNetworkModel(response.body().getResults()));
+                        mitems = response.body().getResults();
+                        setAdapter();
+
+                    } catch (Exception e) {
+                        Log.e(TAG, " INSERT ", e);
+                    }
+
+                } else Log.e("No Connection ", response.errorBody().toString());
+            }
+
+            @Override
+            public void onFailure(Call<UserItem> call, Throwable t) {
+                Toast.makeText(UsersActivity.this, "Check your internet connection ", Toast.LENGTH_SHORT).show();
+                Log.e("INTERNET ERROR ", " RESPONSE NON EXECUTE ", t);
+            }
+        });
+
+    }
+
+    // Delcarate holder for rercyclerview item
+    private class UsersHolder extends RecyclerView.ViewHolder {
         private ImageView userImageView;
         private TextView userTextView;
+        private TextView userLocationView;
 
         public UsersHolder(View itemView) {
             super(itemView);
-            userImageView=itemView.findViewById(R.id.user_item_image);
-            userTextView=itemView.findViewById(R.id.user_item_fio);
+
+            // RecyclerView child views init
+            userImageView = itemView.findViewById(R.id.user_item_image);
+            userTextView = itemView.findViewById(R.id.user_item_fio);
+            userLocationView = itemView.findViewById(R.id.user_item_location);
         }
 
 
     }
 
-    private class UsersAdapter extends RecyclerView.Adapter<UsersHolder>{
-        private List<UsersItem> mUsersItems;
+    private class UsersAdapter extends RecyclerView.Adapter<UsersHolder> {
+        private List<Result> mUsersItems;
 
-        public UsersAdapter(List<UsersItem> items){
+        public UsersAdapter(List<Result> items) {
 
-            mUsersItems=items;
+            mUsersItems = items;
         }
 
 
         @Override
         public UsersHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater=LayoutInflater.from(UsersActivity.this);
-            View v =inflater.from(parent.getContext()).inflate(R.layout.users_item,parent,false);
+
+
+            // Inflate RecyclerView child from users_item layout and set onclick listener for RV childs
+            LayoutInflater inflater = LayoutInflater.from(UsersActivity.this);
+            View v = inflater.from(parent.getContext()).inflate(R.layout.users_item, parent, false);
             v.setOnClickListener(new MyOnClickListener());
 
             return new UsersHolder(v);
@@ -103,11 +162,18 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
 
         @Override
         public void onBindViewHolder(UsersHolder holder, int position) {
-            UsersItem usersItem=mUsersItems.get(position);
 
-            Picasso.with(UsersActivity.this).load(usersItem.getUrl()).into(holder.userImageView);
+            // Apply data for RecyclerView child views
+            Result usersItem = mUsersItems.get(position);
 
-            holder.userTextView.setText(usersItem.getName());
+            Picasso.with(UsersActivity.this).load(usersItem.getPicture().getMedium()).into(holder.userImageView);
+
+            holder.userTextView.setText(jsonMapper.formateCorrectNames(usersItem.getName().getTitle()) + "."
+                    + " " + jsonMapper.formateCorrectNames(usersItem.getName().getFirst())
+                    + " " + jsonMapper.formateCorrectNames(usersItem.getName().getLast()));
+
+            holder.userLocationView.setText(jsonMapper.formateCorrectNames(usersItem.getLocation().getCity() + ", " +
+                    usersItem.getNat()));
 
 
         }
@@ -119,38 +185,23 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
             return mUsersItems.size();
         }
 
-
-    }
-
-    private  class RandomUsersItemTask extends AsyncTask<Void,Void,List<UsersItem>>{
-
-        @Override
-        protected List<UsersItem> doInBackground(Void... voids) {
-           RandomUserApi randomUserApi=  new RandomUserApi();
-          //  Log.e("LEST_ASYNC ",randomUserApi.getItems(20).toString());
-            return randomUserApi.getItems(20);
-
-        }
-
-        @Override
-        protected void onPostExecute(List<UsersItem> items) {
-            DatabaseHelper databaseHelper=new DatabaseHelper();
-            databaseHelper.insert(items);
-
-
-            mitems=databaseHelper.select();
-            setAdapter();
-        }
     }
 
     public class MyOnClickListener implements View.OnClickListener {
-        DatabaseHelper databaseHelper=new DatabaseHelper();
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+
+
+        // If RecyclerView child is clicked
         @Override
         public void onClick(View v) {
-            int itemPosition = usersRecyclerView.indexOfChild(v);
-            UsersItem userClicked =databaseHelper.selectByID(itemPosition);
-            Log.e("Clicked on ",userClicked.getName());
-            Log.e("Clicked on ",String.valueOf(itemPosition));
+
+            int itemPosition = usersRecyclerView.getChildAdapterPosition(v);
+
+            Intent intent = new Intent(UsersActivity.this, UserActivity.class);
+            intent.putExtra("USER_ID", itemPosition);
+            startActivity(intent);
+
+            Log.e("Clicked on ", String.valueOf(itemPosition));
         }
     }
 }
