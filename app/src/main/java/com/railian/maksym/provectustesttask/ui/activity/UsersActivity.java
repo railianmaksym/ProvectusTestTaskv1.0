@@ -66,15 +66,11 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
         final DatabaseHelper databaseHelper = new DatabaseHelper();
         databaseHelper.deleteAll();
         mSwipeRefreshLayout.setRefreshing(true);
-
+        loadData();
         // Load data from server
-        mSwipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadData();
-                mSwipeRefreshLayout.setRefreshing(false);
-                setAdapter();
-            }
+        mSwipeRefreshLayout.postDelayed(() -> {
+            setAdapter();
+            mSwipeRefreshLayout.setRefreshing(false);
         }, 2000);
     }
 
@@ -90,7 +86,6 @@ public class UsersActivity extends AppCompatActivity implements SwipeRefreshLayo
 
                         databaseHelper.insert(jsonMapper.convertFromNetworkModel(response.body().getResults()));
                         mitems = response.body().getResults();
-                        setAdapter();
 
                     } catch (Exception e) {
                         Log.e(TAG, " INSERT ", e);
