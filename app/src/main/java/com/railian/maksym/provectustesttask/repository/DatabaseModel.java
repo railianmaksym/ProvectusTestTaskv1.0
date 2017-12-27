@@ -1,7 +1,5 @@
-package com.railian.maksym.provectustesttask;
+package com.railian.maksym.provectustesttask.repository;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -11,70 +9,69 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
  * Created by fluffy on 04.07.17.
  */
 
-// Database Table annotation
+
 @Table(database = Database.class)
 
 public class DatabaseModel extends BaseModel {
 
-    // Applying annotations for Database (this table)
     @Column
     @PrimaryKey
-    int Id;
+    public int Id;
 
     @Column
-    String gender;
+    public String gender;
 
     @Column
-    String title;
+    public String title;
 
     @Column
-    String first;
+    public String first;
 
     @Column
-    String last;
+    public String last;
 
     @Column
-    String street;
+    public String street;
 
     @Column
-    String city;
+    public String city;
 
     @Column
-    String state;
+    public String state;
 
     @Column
-    String postcode;
+    public String postcode;
 
     @Column
-    String email;
+    public String email;
 
     @Column
-    String username;
+    public String username;
 
     @Column
-    String dob;
+    public String dob;
 
     @Column
-    String registered;
+    public String registered;
 
     @Column
-    String phone;
+    public String phone;
 
     @Column
-    String cell;
+    public String cell;
 
     @Column
-    String thumbnail;
+    public String thumbnail;
 
     @Column
-    String medium;
+    public  String medium;
 
     @Column
-    String large;
+    public String large;
 
 
     @Column
-    String nat;
+    public String nat;
 
     //Getters and Setters
     public int getId() {

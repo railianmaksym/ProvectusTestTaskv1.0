@@ -1,16 +1,14 @@
 
-package com.railian.maksym.provectustesttask;
+package com.railian.maksym.provectustesttask.models;
 
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.raizlabs.android.dbflow.annotation.Table;
+import com.railian.maksym.provectustesttask.models.Result;
 
 
 public class UserItem {
-
-    //Data collection from all model classes
 
     @SerializedName("results")
     @Expose
@@ -18,9 +16,5 @@ public class UserItem {
 
     public List<Result> getResults() {
         return results;
-    }
-
-    public void setResults(List<Result> results) {
-        this.results = results;
     }
 }

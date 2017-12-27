@@ -1,10 +1,5 @@
-package com.railian.maksym.provectustesttask;
+package com.railian.maksym.provectustesttask.repository;
 
-/**
- * Created by fluffy on 30.06.17.
- */
-
-// Database declaration
 @com.raizlabs.android.dbflow.annotation.Database(name = Database.NAME,version = Database.VERSION)
 
 public class Database {

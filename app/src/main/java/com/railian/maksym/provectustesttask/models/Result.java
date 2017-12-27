@@ -1,16 +1,11 @@
 
-package com.railian.maksym.provectustesttask;
+package com.railian.maksym.provectustesttask.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 public class Result extends BaseModel{
-
-    // Applying annotations for gson convertor
 
     @SerializedName("gender")
     @Expose

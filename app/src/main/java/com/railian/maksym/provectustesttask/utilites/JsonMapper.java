@@ -1,13 +1,15 @@
-package com.railian.maksym.provectustesttask;
+package com.railian.maksym.provectustesttask.utilites;
+
+import com.railian.maksym.provectustesttask.models.Location;
+import com.railian.maksym.provectustesttask.models.Login;
+import com.railian.maksym.provectustesttask.models.Name;
+import com.railian.maksym.provectustesttask.models.Picture;
+import com.railian.maksym.provectustesttask.models.Result;
+import com.railian.maksym.provectustesttask.repository.DatabaseModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.System.in;
-
-/**
- * Created by fluffy on 04.07.17.
- */
 
 // Mapper to fixing incompatibility gson and DBFlow annotations
 public class JsonMapper {

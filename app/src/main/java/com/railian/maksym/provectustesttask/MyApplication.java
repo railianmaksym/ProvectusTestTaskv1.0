@@ -3,7 +3,7 @@ package com.railian.maksym.provectustesttask;
 import android.app.Application;
 import android.net.Uri;
 
-import com.google.gson.Gson;
+import com.railian.maksym.provectustesttask.network.RandomUserApi;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
